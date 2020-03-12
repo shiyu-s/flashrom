@@ -195,6 +195,11 @@ UNSUPPORTED_FEATURES += CONFIG_STLINKV3_SPI=yes
 else
 override CONFIG_STLINKV3_SPI = no
 endif
+ifeq ($(CONFIG_LSPCON_I2C_SPI), yes)
+UNSUPPORTED_FEATURES += CONFIG_LSPCON_I2C_SPI=yes
+else
+override CONFIG_LSPCON_I2C_SPI = no
+endif
 # libjaylink is also not available for DOS
 ifeq ($(CONFIG_JLINK_SPI), yes)
 UNSUPPORTED_FEATURES += CONFIG_JLINK_SPI=yes
@@ -306,6 +311,11 @@ UNSUPPORTED_FEATURES += CONFIG_SATAMV=yes
 else
 override CONFIG_SATAMV = no
 endif
+ifeq ($(CONFIG_LSPCON_I2C_SPI), yes)
+UNSUPPORTED_FEATURES += CONFIG_LSPCON_I2C_SPI=yes
+else
+override CONFIG_LSPCON_I2C_SPI = no
+endif
 endif
 
 ifneq ($(TARGET_OS), MinGW)
@@ -381,6 +391,11 @@ UNSUPPORTED_FEATURES += CONFIG_STLINKV3_SPI=yes
 else
 override CONFIG_STLINKV3_SPI = no
 endif
+ifeq ($(CONFIG_LSPCON_I2C_SPI), yes)
+UNSUPPORTED_FEATURES += CONFIG_LSPCON_I2C_SPI=yes
+else
+override CONFIG_LSPCON_I2C_SPI = no
+endif
 ifeq ($(CONFIG_CH341A_SPI), yes)
 UNSUPPORTED_FEATURES += CONFIG_CH341A_SPI=yes
 else
@@ -416,6 +431,10 @@ UNSUPPORTED_FEATURES += CONFIG_RAYER_SPI=yes
 else
 override CONFIG_RAYER_SPI = no
 endif
+endif
+
+ifeq ($(TARGET_OS), Linux)
+CONFIG_LINUX_I2C_HELPER = yes
 endif
 
 ###############################################################################
@@ -652,6 +671,9 @@ CONFIG_PICKIT2_SPI ?= yes
 # Always enable STLink V3
 CONFIG_STLINKV3_SPI ?= yes
 
+# Always enable I2C SPI
+CONFIG_LSPCON_I2C_SPI ?= yes
+
 # Always enable dummy tracing for now.
 CONFIG_DUMMY ?= yes
 
@@ -731,6 +753,7 @@ override CONFIG_DIGILENT_SPI = no
 override CONFIG_DEVELOPERBOX_SPI = no
 override CONFIG_PICKIT2_SPI = no
 override CONFIG_STLINKV3_SPI = no
+override CONFIG_LSPCON_I2C_SPI = no
 endif
 ifeq ($(CONFIG_ENABLE_LIBPCI_PROGRAMMERS), no)
 override CONFIG_INTERNAL = no
@@ -909,6 +932,12 @@ PROGRAMMER_OBJS += stlinkv3_spi.o
 NEED_LIBUSB1 += CONFIG_STLINKV3_SPI
 endif
 
+ifeq ($(CONFIG_LSPCON_I2C_SPI), yes)
+FEATURE_CFLAGS += -D'CONFIG_LSPCON_I2C_SPI=1'
+PROGRAMMER_OBJS += lspcon_i2c_spi.o
+NEED_LIBUSB1 += CONFIG_LSPCON_I2C_SPI
+endif
+
 ifneq ($(NEED_LIBFTDI), )
 FTDILIBS := $(call debug_shell,[ -n "$(PKG_CONFIG_LIBDIR)" ] && export PKG_CONFIG_LIBDIR="$(PKG_CONFIG_LIBDIR)" ; $(PKG_CONFIG) --libs libftdi1 || $(PKG_CONFIG) --libs libftdi || printf "%s" "-lftdi -lusb")
 FEATURE_CFLAGS += $(call debug_shell,grep -q "FT232H := yes" .features && printf "%s" "-D'HAVE_FT232H=1'")
@@ -1045,6 +1074,11 @@ endif
 FEATURE_CFLAGS += $(NI845X_INCLUDES)
 LIBS += -lni845x
 PROGRAMMER_OBJS += ni845x_spi.o
+endif
+
+ifeq ($(CONFIG_LINUX_I2C_HELPER), yes)
+LIB_OBJS += i2c_helper_linux.o
+FEATURE_CFLAGS += -D'CONFIG_LINUX_I2C_HELPER=1'
 endif
 
 ifneq ($(NEED_SERIAL), )

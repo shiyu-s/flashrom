@@ -35,3 +35,5 @@ option('config_satasii', type : 'boolean', value : true, description : 'SiI SATA
 option('config_serprog', type : 'boolean', value : true, description : 'serprog')
 option('config_usbblaster_spi', type : 'boolean', value : true, description : 'Altera USB-Blaster dongles')
 option('config_stlinkv3_spi', type : 'boolean', value : true, description : 'STMicroelectronics STLINK-V3')
+option('config_lspcon_i2c_spi', type : 'boolean', value : true, description : 'SPI control from I2C bus')
+option('config_linux_i2c_helper', type: 'boolean', value : true, description : 'Linux I2C control')
